@@ -60,6 +60,12 @@
 
     function calculate(id) {
         let binary = calculateBinary(id)
+
+        for (const e of document.getElementsByTagName("input")) {
+            e.style.backgroundColor = "white"
+        }
+        document.getElementById(id).style.backgroundColor = binary === "?" ? "#ff9999" : "#92ea92"
+
         document.getElementById("res_decimal").innerText = String(binaryToDecimal(binary) === 0 ? "" : binaryToDecimal(binary))
         document.getElementById("res_binary").innerText = decimalToBinary(binaryToDecimal(binary))
         document.getElementById("res_hex").innerText = binaryToHex(binary)
@@ -68,11 +74,6 @@
 
     function calculateBinary(input_id) {
         let text = document.getElementById(input_id).value;
-
-        for (const e of document.getElementsByTagName("input")) {
-            e.style.backgroundColor = "white"
-        }
-        document.getElementById(input_id).style.backgroundColor = "#92ea92"
 
         switch (input_id) {
             case "input_binary": return decimalToBinary(binaryToDecimal(text)); // validate it
@@ -123,8 +124,9 @@
 
         for (let i = 0; i < hex.length; i++) {
             const char = hex[hex.length-i-1].toUpperCase().charCodeAt(0)
+            if (char < 48 || char > 70 || (char >= 58 && char <= 64)) return "?"
 
-            const decimal = char <= 57 ? char - 48 :char - 55
+            const decimal = char <= 57 ? char - 48 : char - 55
 
             res = decimalToBinary(decimal) + res
         }
