@@ -10,9 +10,29 @@
 
 <body>
 
-<label for="input_binary">Enter Binary</label>
-<br>
-<input placeholder="Binary" id="input_binary" oninput="calculate(this.id)">
+<div style="display: flex; flex-direction: row; ">
+    <div style="margin: 20px">
+        <label for="input_binary">Enter Binary</label>
+        <br>
+        <input placeholder="Binary" id="input_binary" oninput="calculate(this.id)">
+
+    </div>
+
+    <div style="margin: 20px">
+        <label for="input_decimal">Enter Decimal</label>
+        <br>
+        <input placeholder="Decimal" id="input_decimal" oninput="calculate(this.id)">
+    </div>
+
+    <div style="margin: 20px">
+        <label for="input_hex">Enter Hex</label>
+        <br>
+        <input placeholder="Hex" id="input_hex" oninput="calculate(this.id)">
+    </div>
+
+</div>
+
+
 
 <h2>Result in:</h2>
 
@@ -40,8 +60,7 @@
 
     function calculate(id) {
         let binary = calculateBinary(id)
-
-        document.getElementById("res_decimal").innerText = String(binaryToDecimal(binary))
+        document.getElementById("res_decimal").innerText = String(binaryToDecimal(binary) === 0 ? "" : binaryToDecimal(binary))
         document.getElementById("res_binary").innerText = decimalToBinary(binaryToDecimal(binary))
         document.getElementById("res_hex").innerText = binaryToHex(binary)
         document.getElementById("res_octal").innerText = binaryToOctal(binary)
@@ -50,10 +69,15 @@
     function calculateBinary(input_id) {
         let text = document.getElementById(input_id).value;
 
+        for (const e of document.getElementsByTagName("input")) {
+            e.style.backgroundColor = "white"
+        }
+        document.getElementById(input_id).style.backgroundColor = "#92ea92"
+
         switch (input_id) {
             case "input_binary": return decimalToBinary(binaryToDecimal(text)); // validate it
             case "input_decimal": return decimalToBinary(text)
-            case "input_hex": return decimalToHex(text)
+            case "input_hex": return hexToBinary(text)
             case "input_octal": return null // todo
             default: throw Error("Bad base!")
         }
@@ -79,13 +103,30 @@
     }
 
     function decimalToBinary(decimal) {
-        if (typeof decimal !== "number") return "?"
+        if (typeof decimal !== "number") decimal = parseInt(decimal)
+        if (isNaN(decimal)) return "?"
 
         let res = ""
 
         while (decimal > 0) {
             res= (decimal % 2 === 0 ? '0' : '1') + res
             decimal >>= 1
+        }
+        return res
+    }
+
+    function hexToBinary(hex) {
+        if (typeof hex !== "string") return "?"
+        hex = hex.trim().replaceAll(" ", "")
+
+        let res = ""
+
+        for (let i = 0; i < hex.length; i++) {
+            const char = hex[hex.length-i-1].toUpperCase().charCodeAt(0)
+
+            const decimal = char <= 57 ? char - 48 :char - 55
+
+            res = decimalToBinary(decimal) + res
         }
         return res
     }
