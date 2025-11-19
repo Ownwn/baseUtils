@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Utils</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+
+<body>
+
+<label for="input_binary">Enter Binary</label>
+<br>
+<input placeholder="Binary" id="input_binary" oninput="calculate(this.id)">
+
+<h2>Result in:</h2>
+
+<br>
+<span>Decimal: </span>
+<code id="res_decimal" onclick="window.getSelection().selectAllChildren(this)"></code>
+
+<br><br>
+<span>Binary: </span>
+<code id="res_binary" onclick="window.getSelection().selectAllChildren(this)"></code>
+
+<br><br>
+<span>Hex: </span>
+<code id="res_hex" onclick="window.getSelection().selectAllChildren(this)"></code>
+
+<br><br>
+<span>Octal: </span>
+<code id="res_octal" onclick="window.getSelection().selectAllChildren(this)"></code>
+<br>
+
+</body>
+</html>
+
+<script>
+
+    function calculate(id) {
+        let binary = calculateBinary(id)
+
+        document.getElementById("res_decimal").innerText = String(binaryToDecimal(binary))
+        document.getElementById("res_binary").innerText = decimalToBinary(binaryToDecimal(binary))
+        document.getElementById("res_hex").innerText = binaryToHex(binary)
+        document.getElementById("res_octal").innerText = binaryToOctal(binary)
+    }
+
+    function calculateBinary(input_id) {
+        let text = document.getElementById(input_id).value;
+
+        switch (input_id) {
+            case "input_binary": return decimalToBinary(binaryToDecimal(text)); // validate it
+            case "input_decimal": return decimalToBinary(text)
+            case "input_hex": return decimalToHex(text)
+            case "input_octal": return null // todo
+            default: throw Error("Bad base!")
+        }
+    } // todo visualise twos complement too
+
+    function binaryToDecimal(binary) {
+        if (typeof binary !== "string") return "?"
+
+        binary = binary.trim().replaceAll(" ", "")
+        let res = 0;
+
+        for (let i = 0; i < binary.length; i++) {
+            const char = binary[binary.length-i-1]
+            if (char === '1') {
+                res += Math.pow(2, i)
+                continue;
+            }
+
+            if (char !== '0') return "?"
+        }
+
+        return res
+    }
+
+    function decimalToBinary(decimal) {
+        if (typeof decimal !== "number") return "?"
+
+        let res = ""
+
+        while (decimal > 0) {
+            res= (decimal % 2 === 0 ? '0' : '1') + res
+            decimal >>= 1
+        }
+        return res
+    }
+
+    function binaryToHex(binary) {
+        if (typeof binary !== "string") return "?"
+
+        binary = binary.trim().replaceAll(" ", "")
+        let res = ""
+
+        for (let i = 0; i+3 < binary.length; i+=4) {
+            const slice = binary.substring(binary.length-i-4, binary.length-i)
+            const decimal = binaryToDecimal(slice)
+            if (decimal === "?") return "?"
+            const hexCode = decimal <= 9 ? String.fromCharCode(48+decimal) : String.fromCharCode(65+decimal-10)
+
+            res = hexCode + res;
+        }
+        if (binary.length % 4 === 0) return res
+
+        const remainingSlice = binary.substring(0, binary.length%4)
+
+        const decimal = binaryToDecimal(remainingSlice)
+        if (decimal === "?") return "?"
+        const hexCode = decimal <= 9 ? String.fromCharCode(48+decimal) : String.fromCharCode(65+decimal-10)
+
+        res = hexCode + res;
+
+        return res
+    }
+
+    function binaryToOctal(binary) {
+        if (typeof binary !== "string") return "?"
+
+        binary = binary.trim().replaceAll(" ", "")
+        let res = ""
+
+        for (let i = 0; i+2 < binary.length; i+=3) {
+            const slice = binary.substring(binary.length-i-3, binary.length-i)
+            const decimal = binaryToDecimal(slice)
+            if (decimal === "?") return "?"
+            const octal = String.fromCharCode(48+decimal)
+
+            res = octal + res;
+        }
+        if (binary.length % 3 === 0) return res
+
+        const remainingSlice = binary.substring(0, binary.length%3)
+
+        const decimal = binaryToDecimal(remainingSlice)
+        if (decimal === "?") return "?"
+        const octal = String.fromCharCode(48+decimal)
+
+        res = octal + res;
+
+        return res
+    }
+
+</script>
+
+
+<style>
+
+    html {
+        margin: 20px;
+    }
+
+
+</style>
