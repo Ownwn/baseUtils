@@ -225,6 +225,7 @@
     function hexToBinary(hex) {
         if (typeof hex !== "string") return "?"
         hex = hex.trim().replaceAll(" ", "")
+        if (hex.startsWith("0x")) hex = hex.substring(2)
 
         let res = ""
 
