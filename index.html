@@ -30,6 +30,12 @@
         <input placeholder="Hex" id="input_hex" oninput="calculate(this.id)">
     </div>
 
+    <div style="margin: 20px">
+        <label for="input_octal">Enter Octal</label>
+        <br>
+        <input placeholder="Octal" id="input_octal" oninput="calculate(this.id)">
+    </div>
+
 </div>
 
 
@@ -58,6 +64,29 @@
 
 <script>
 
+    test()
+
+
+    function test() {
+        const start = Date.now()
+
+        for (let k = 1; k < 1000; k++) {
+            const i = Math.floor(Math.random()*1000000)
+            const binary = decimalToBinary(i, 0)
+            const hex = binaryToHex(binary)
+            const octal = binaryToOctal(binary)
+            const decimal = binaryToDecimal(binary)
+
+            console.assert(i === parseInt(binary, 2), binary)
+            console.assert(i === parseInt(hex, 16), binary)
+            console.assert(i === parseInt(octal, 8), binary)
+            console.assert(i === decimal, binary)
+            console.assert(i === binaryToDecimal(hexToBinary(hex)), binary)
+            console.assert(i === binaryToDecimal(octalToBinary(octal)), binary)
+        }
+        console.log("Tests passed in " + (Date.now()-start) + "ms")
+    }
+
     function calculate(id) {
         let binary = calculateBinary(id)
 
@@ -67,7 +96,7 @@
         document.getElementById(id).style.backgroundColor = binary === "?" ? "#ff9999" : "#92ea92"
 
         document.getElementById("res_decimal").innerText = String(binaryToDecimal(binary) === 0 ? "" : binaryToDecimal(binary))
-        document.getElementById("res_binary").innerText = decimalToBinary(binaryToDecimal(binary))
+        document.getElementById("res_binary").innerText = decimalToBinary(binaryToDecimal(binary), 0)
         document.getElementById("res_hex").innerText = binaryToHex(binary)
         document.getElementById("res_octal").innerText = binaryToOctal(binary)
     }
@@ -76,10 +105,10 @@
         let text = document.getElementById(input_id).value;
 
         switch (input_id) {
-            case "input_binary": return decimalToBinary(binaryToDecimal(text)); // validate it
-            case "input_decimal": return decimalToBinary(text)
+            case "input_binary": return decimalToBinary(binaryToDecimal(text), 0); // validate it
+            case "input_decimal": return decimalToBinary(text, 0)
             case "input_hex": return hexToBinary(text)
-            case "input_octal": return null // todo
+            case "input_octal": return octalToBinary(text) // todo
             default: throw Error("Bad base!")
         }
     } // todo visualise twos complement too
@@ -103,7 +132,7 @@
         return res
     }
 
-    function decimalToBinary(decimal) {
+    function decimalToBinary(decimal, numCharsToPad) {
         if (typeof decimal !== "number") decimal = parseInt(decimal)
         if (isNaN(decimal)) return "?"
 
@@ -113,7 +142,7 @@
             res= (decimal % 2 === 0 ? '0' : '1') + res
             decimal >>= 1
         }
-        return res
+        return res.padStart(numCharsToPad, '0')
     }
 
     function hexToBinary(hex) {
@@ -123,12 +152,32 @@
         let res = ""
 
         for (let i = 0; i < hex.length; i++) {
-            const char = hex[hex.length-i-1].toUpperCase().charCodeAt(0)
-            if (char < 48 || char > 70 || (char >= 58 && char <= 64)) return "?"
+            const char = hex[i].toUpperCase().charCodeAt(0)
+            if (char < 48 || char > 70 || (char >= 58 && char <= 64)) return "?" // 0-9, a-f
 
             const decimal = char <= 57 ? char - 48 : char - 55
+            let binary = decimalToBinary(decimal, 4);
 
-            res = decimalToBinary(decimal) + res
+            res+= binary
+        }
+        return res
+    }
+
+
+    function octalToBinary(octal) {
+        if (typeof octal !== "string") return "?"
+        octal = octal.trim().replaceAll(" ", "")
+
+        let res = ""
+
+        for (let i = 0; i < octal.length; i++) {
+            const char = octal[i].toUpperCase().charCodeAt(0)
+            if (char < 48 || char > 55) return "?" // 0-7
+
+            const decimal = char-48;
+            let binary = decimalToBinary(decimal, 3);
+
+            res+= binary
         }
         return res
     }
