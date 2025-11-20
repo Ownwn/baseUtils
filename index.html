@@ -66,9 +66,20 @@
 
     test()
 
-
     function test() {
         const start = Date.now()
+
+        generalTests()
+        binaryTests()
+        hexTests()
+        octalTests()
+
+        console.log("Tests passed in " + (Date.now()-start) + "ms")
+    }
+
+
+    function generalTests() {
+
 
         for (let k = 1; k < 1000; k++) {
             const i = Math.floor(Math.random()*1000000)
@@ -84,8 +95,46 @@
             console.assert(i === binaryToDecimal(hexToBinary(hex)), binary)
             console.assert(i === binaryToDecimal(octalToBinary(octal)), binary)
         }
-        console.log("Tests passed in " + (Date.now()-start) + "ms")
+
     }
+
+    function binaryTests() {
+        for (let i = 0; i < 5000; i++) {
+            const binaryLength = Math.floor(1+Math.random()*24) // cant make it too long or will get floating-point errors. thanks JS!
+            let binary = ""
+            for (let j = 0; j < binaryLength; j++) {
+                binary+= Math.random() > 0.5 ? '0' : '1';
+            }
+            console.assert(binaryToDecimal(binary) === parseInt(binary, 2), binary)
+        }
+    }
+
+    function hexTests() {
+        for (let i = 0; i < 5000; i++) {
+            const hexLength = Math.floor(1+Math.random()*6)
+            let hex = ""
+            for (let j = 0; j < hexLength; j++) {
+                if (Math.random() > 0.5) {
+                    hex+= String.fromCharCode(48+Math.random()*9)
+                } else {
+                    hex+= String.fromCharCode(65+Math.random()*5)
+                }
+            }
+            console.assert(binaryToDecimal(hexToBinary(hex)) === parseInt(hex, 16), hex)
+        }
+    }
+
+    function octalTests() {
+        for (let i = 0; i < 5000; i++) {
+            const octalLength = Math.floor(1+Math.random()*6)
+            let octal = ""
+            for (let j = 0; j < octalLength; j++) {
+                octal+= String.fromCharCode(48+Math.random()*7)
+            }
+            console.assert(binaryToDecimal(octalToBinary(octal)) === parseInt(octal, 8), octal)
+        }
+    }
+
 
     function calculate(id) {
         let binary = calculateBinary(id)
