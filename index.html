@@ -10,27 +10,27 @@
 
 <body>
 
-<div style="display: flex; flex-direction: row; ">
-    <div style="margin: 20px">
+<div class="inputs">
+    <div>
         <label for="input_binary">Enter Binary</label>
         <br>
         <input placeholder="Binary" id="input_binary" oninput="calculate(this.id)">
 
     </div>
 
-    <div style="margin: 20px">
+    <div>
         <label for="input_decimal">Enter Decimal</label>
         <br>
         <input placeholder="Decimal" id="input_decimal" oninput="calculate(this.id)">
     </div>
 
-    <div style="margin: 20px">
+    <div>
         <label for="input_hex">Enter Hex</label>
         <br>
         <input placeholder="Hex" id="input_hex" oninput="calculate(this.id)">
     </div>
 
-    <div style="margin: 20px">
+    <div>
         <label for="input_octal">Enter Octal</label>
         <br>
         <input placeholder="Octal" id="input_octal" oninput="calculate(this.id)">
@@ -39,24 +39,31 @@
 </div>
 
 
-
-<h2>Result in:</h2>
-
 <br>
-<span>Decimal: </span>
-<code id="res_decimal" onclick="window.getSelection().selectAllChildren(this)"></code>
+<br>
 
-<br><br>
-<span>Binary: </span>
-<code id="res_binary" onclick="window.getSelection().selectAllChildren(this)"></code>
+<div class="outputs">
+    <div>
+        <span>Decimal: </span>
+        <code id="res_decimal" onclick="window.getSelection().selectAllChildren(this)"></code>
+    </div>
 
-<br><br>
-<span>Hex: </span>
-<code id="res_hex" onclick="window.getSelection().selectAllChildren(this)"></code>
+    <div>
+        <span>Binary: </span>
+        <code id="res_binary" onclick="window.getSelection().selectAllChildren(this)"></code>
+    </div>
 
-<br><br>
-<span>Octal: </span>
-<code id="res_octal" onclick="window.getSelection().selectAllChildren(this)"></code>
+    <div>
+        <span>Hex: </span>
+        <code id="res_hex" onclick="window.getSelection().selectAllChildren(this)"></code>
+    </div>
+
+    <div>
+        <span>Octal: </span>
+        <code id="res_octal" onclick="window.getSelection().selectAllChildren(this)"></code>
+    </div>
+</div>
+
 <br>
 
 </body>
@@ -74,7 +81,7 @@
         hexTests()
         octalTests()
 
-        console.log("Tests passed in " + (Date.now()-start) + "ms")
+        console.log("Tests passed in " + (Date.now() - start) + "ms")
     }
 
 
@@ -82,7 +89,7 @@
 
 
         for (let k = 1; k < 1000; k++) {
-            const i = Math.floor(Math.random()*1000000)
+            const i = Math.floor(Math.random() * 1000000)
             const binary = decimalToBinary(i, 0)
             const hex = binaryToHex(binary)
             const octal = binaryToOctal(binary)
@@ -100,10 +107,10 @@
 
     function binaryTests() {
         for (let i = 0; i < 5000; i++) {
-            const binaryLength = Math.floor(1+Math.random()*24) // cant make it too long or will get floating-point errors. thanks JS!
+            const binaryLength = Math.floor(1 + Math.random() * 24) // cant make it too long or will get floating-point errors. thanks JS!
             let binary = ""
             for (let j = 0; j < binaryLength; j++) {
-                binary+= Math.random() > 0.5 ? '0' : '1';
+                binary += Math.random() > 0.5 ? '0' : '1';
             }
             console.assert(binaryToDecimal(binary) === parseInt(binary, 2), binary)
         }
@@ -111,13 +118,13 @@
 
     function hexTests() {
         for (let i = 0; i < 5000; i++) {
-            const hexLength = Math.floor(1+Math.random()*6)
+            const hexLength = Math.floor(1 + Math.random() * 6)
             let hex = ""
             for (let j = 0; j < hexLength; j++) {
                 if (Math.random() > 0.5) {
-                    hex+= String.fromCharCode(48+Math.random()*9)
+                    hex += String.fromCharCode(48 + Math.random() * 9)
                 } else {
-                    hex+= String.fromCharCode(65+Math.random()*5)
+                    hex += String.fromCharCode(65 + Math.random() * 5)
                 }
             }
             console.assert(binaryToDecimal(hexToBinary(hex)) === parseInt(hex, 16), hex)
@@ -126,10 +133,10 @@
 
     function octalTests() {
         for (let i = 0; i < 5000; i++) {
-            const octalLength = Math.floor(1+Math.random()*6)
+            const octalLength = Math.floor(1 + Math.random() * 6)
             let octal = ""
             for (let j = 0; j < octalLength; j++) {
-                octal+= String.fromCharCode(48+Math.random()*7)
+                octal += String.fromCharCode(48 + Math.random() * 7)
             }
             console.assert(binaryToDecimal(octalToBinary(octal)) === parseInt(octal, 8), octal)
         }
@@ -154,11 +161,16 @@
         let text = document.getElementById(input_id).value;
 
         switch (input_id) {
-            case "input_binary": return decimalToBinary(binaryToDecimal(text), 0); // validate it
-            case "input_decimal": return decimalToBinary(text, 0)
-            case "input_hex": return hexToBinary(text)
-            case "input_octal": return octalToBinary(text) // todo
-            default: throw Error("Bad base!")
+            case "input_binary":
+                return decimalToBinary(binaryToDecimal(text), 0); // validate it
+            case "input_decimal":
+                return decimalToBinary(text, 0)
+            case "input_hex":
+                return hexToBinary(text)
+            case "input_octal":
+                return octalToBinary(text) // todo
+            default:
+                throw Error("Bad base!")
         }
     } // todo visualise twos complement too
 
@@ -167,11 +179,16 @@
 
         binary = binary.trim().replaceAll(" ", "")
         let res = 0;
+        let hasReachedBigInt = false;
 
         for (let i = 0; i < binary.length; i++) {
-            const char = binary[binary.length-i-1]
+            const char = binary[binary.length - i - 1]
             if (char === '1') {
-                res += Math.pow(2, i)
+                if (!hasReachedBigInt && res >= 5e8) {
+                    res = BigInt(res)
+                    hasReachedBigInt = true
+                }
+                res += hasReachedBigInt ? BigInt(Math.pow(2, i)) : Math.pow(2, i)
                 continue;
             }
 
@@ -182,13 +199,24 @@
     }
 
     function decimalToBinary(decimal, numCharsToPad) {
-        if (typeof decimal !== "number") decimal = parseInt(decimal)
+        if (typeof decimal === "bigint") {
+            let res = ""
+
+            while (decimal > 0) {
+                res = (decimal % 2n === 0n ? '0' : '1') + res
+                decimal >>= 1n
+            }
+            return res.padStart(numCharsToPad, '0')
+        }
+
+
+        if (typeof decimal !== "number" ) decimal = parseInt(decimal)
         if (isNaN(decimal)) return "?"
 
         let res = ""
 
         while (decimal > 0) {
-            res= (decimal % 2 === 0 ? '0' : '1') + res
+            res = (decimal % 2 === 0 ? '0' : '1') + res
             decimal >>= 1
         }
         return res.padStart(numCharsToPad, '0')
@@ -207,7 +235,7 @@
             const decimal = char <= 57 ? char - 48 : char - 55
             let binary = decimalToBinary(decimal, 4);
 
-            res+= binary
+            res += binary
         }
         return res
     }
@@ -223,10 +251,10 @@
             const char = octal[i].toUpperCase().charCodeAt(0)
             if (char < 48 || char > 55) return "?" // 0-7
 
-            const decimal = char-48;
+            const decimal = char - 48;
             let binary = decimalToBinary(decimal, 3);
 
-            res+= binary
+            res += binary
         }
         return res
     }
@@ -237,21 +265,21 @@
         binary = binary.trim().replaceAll(" ", "")
         let res = ""
 
-        for (let i = 0; i+3 < binary.length; i+=4) {
-            const slice = binary.substring(binary.length-i-4, binary.length-i)
+        for (let i = 0; i + 3 < binary.length; i += 4) {
+            const slice = binary.substring(binary.length - i - 4, binary.length - i)
             const decimal = binaryToDecimal(slice)
             if (decimal === "?") return "?"
-            const hexCode = decimal <= 9 ? String.fromCharCode(48+decimal) : String.fromCharCode(65+decimal-10)
+            const hexCode = decimal <= 9 ? String.fromCharCode(48 + decimal) : String.fromCharCode(65 + decimal - 10)
 
             res = hexCode + res;
         }
         if (binary.length % 4 === 0) return res
 
-        const remainingSlice = binary.substring(0, binary.length%4)
+        const remainingSlice = binary.substring(0, binary.length % 4)
 
         const decimal = binaryToDecimal(remainingSlice)
         if (decimal === "?") return "?"
-        const hexCode = decimal <= 9 ? String.fromCharCode(48+decimal) : String.fromCharCode(65+decimal-10)
+        const hexCode = decimal <= 9 ? String.fromCharCode(48 + decimal) : String.fromCharCode(65 + decimal - 10)
 
         res = hexCode + res;
 
@@ -264,21 +292,21 @@
         binary = binary.trim().replaceAll(" ", "")
         let res = ""
 
-        for (let i = 0; i+2 < binary.length; i+=3) {
-            const slice = binary.substring(binary.length-i-3, binary.length-i)
+        for (let i = 0; i + 2 < binary.length; i += 3) {
+            const slice = binary.substring(binary.length - i - 3, binary.length - i)
             const decimal = binaryToDecimal(slice)
             if (decimal === "?") return "?"
-            const octal = String.fromCharCode(48+decimal)
+            const octal = String.fromCharCode(48 + decimal)
 
             res = octal + res;
         }
         if (binary.length % 3 === 0) return res
 
-        const remainingSlice = binary.substring(0, binary.length%3)
+        const remainingSlice = binary.substring(0, binary.length % 3)
 
         const decimal = binaryToDecimal(remainingSlice)
         if (decimal === "?") return "?"
-        const octal = String.fromCharCode(48+decimal)
+        const octal = String.fromCharCode(48 + decimal)
 
         res = octal + res;
 
@@ -292,6 +320,54 @@
 
     html {
         margin: 20px;
+    }
+
+    span {
+        font-size: 30px;
+    }
+
+    code {
+        font-size: 30px;
+        background-color: #e1e1e1;
+        padding: 10px;
+        border-radius: 5px;
+        border: 2px dashed;
+    }
+
+    code:hover {
+        cursor: pointer;
+    }
+
+    .inputs {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .inputs > * {
+        margin: 20px;
+    }
+
+    .outputs {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .outputs > div {
+        margin-top: 20px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+
+    }
+
+    .outputs > div > span {
+        flex-shrink: 0;
+        margin-right: 10px;
+    }
+
+    .outputs > div > span {
+        flex-shrink: 0;
+        margin-right: 10px;
     }
 
 
